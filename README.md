@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Study Hub
+
+A Next.js-based Study Hub is a web application. This project integrates a conversational AI interface, resource sidebar, and session management, styled with Tailwind CSS and powered by Supabase for backend services.
+
+## Features
+
+- Interactive chatbot for LMS queries
+- Sidebar for navigation and session selection
+- Resource panel for supplementary materials
+- Responsive UI with Tailwind CSS
+- Supabase integration for authentication and data storage
+- Markdown support in chat messages
+
+
+## Tech Stack
+
+- [Next.js](https://nextjs.org/)
+- [React](https://react.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Supabase](https://supabase.com/)
+- [DeepSeek](https://deepseek.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Lucide React](https://lucide.dev/)
+- [React Markdown](https://github.com/remarkjs/react-markdown)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js >= 18.x
+- npm
+
+### Installation
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/yourusername/lms-chatbot.git
+   cd lms-chatbot
+   ```
+
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+
+3. Set up environment variables:
+   - Copy `.env.local.example` to `.env.local` and fill in your Supabase and OpenAI credentials.
+
+4. Run the development server:
+   ```sh
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Build for Production
+
+```sh
+npm run build
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `src/` — Application source code
+- `public/` — Static assets
+- `videos/` — Video resources
+- `.next/` — Next.js build output (ignored in git)
+- `.env.local` — Environment variables (ignored in git)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+- `npm run dev` — Start development server
+- `npm run build` — Build for production
+- `npm start` — Start production server
+- `npm run lint` — Run ESLint
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+MIT
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For more details, see [package.json](package.json).

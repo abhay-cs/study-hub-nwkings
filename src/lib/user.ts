@@ -1,30 +1,32 @@
-import { v4 as uuidv4 } from "uuid";
-import {supabase} from "@/lib/supabase/client"
-export function getUserId() {
-    if (typeof window === "undefined") {
-        return null; // avoid crashing on server
-    }
+import { supabase } from "@/lib/supabase/client";
 
-    let userId = localStorage.getItem("user_id");
-    if (!userId) {
-        userId = uuidv4();
-        localStorage.setItem("user_id", userId);
-    }
-    return userId;
+// 🔹 Get the currently logged-in Supabase user
+export async function getCurrentUser() {
+    const {
+        data: { user },
+        error,
+    } = await supabase.auth.getUser();
+
+    if (error) throw error;
+    return user; // contains id, email, etc.
 }
 
-export async function ensureUser(userId: string) {
-    const { data, error } = await supabase
-        .from("users")
-        .select("id")
-        .eq("id", userId)
-        .maybeSingle();
+// 🔹 Ensure the user exists in public.users table
+export async function ensureUser() {
+    const user = await getCurrentUser();
+    if (!user) return null;
 
-    if (!data) {
-        // insert new user row
-        const { error: insertError } = await supabase
-            .from("users")
-            .insert([{ id: userId }]); // add other required columns if needed
-        if (insertError) throw insertError;
-    }
+    // Upsert ensures row exists, updates if it already does
+    const { error } = await supabase.from("users").upsert(
+        {
+            id: user.id, // use Supabase auth.users.id
+            email: user.email,
+            name: user.user_metadata?.name ?? null,
+        },
+        { onConflict: "id" }
+    );
+
+    if (error) throw error;
+
+    return user;
 }

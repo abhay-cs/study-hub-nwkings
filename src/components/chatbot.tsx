@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { askChatbot } from "@/lib/api";
 import { getMessages, saveMessage } from "@/lib/messages";
 import { handleSession } from "@/lib/sessions";
-import { getUserId, ensureUser } from "@/lib/user";
+import { ensureUser, getCurrentUser } from "@/lib/user";
 
 type Message = { from: "user" | "bot"; text: string; created_at?: string };
+type ChatBotProps = { course: any };
 
-export function ChatBot() {
+export function ChatBot({ course }: ChatBotProps) {
 	const messagesEndRef = React.useRef<HTMLDivElement | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState("");
@@ -19,7 +20,12 @@ export function ChatBot() {
 	const [sessionId, setSessionId] = useState<string | null>(null);
 
 	useEffect(() => {
-		setUserId(getUserId());
+		(async () => {
+			const user = await getCurrentUser();
+			if (!user) return;
+			setUserId(user.id);
+			await ensureUser();
+		})();
 	}, []);
 
 	useEffect(() => {
@@ -28,16 +34,9 @@ export function ChatBot() {
 
 	useEffect(() => {
 		if (!userId) return;
-
 		(async () => {
-			await ensureUser(userId);
-
-			const session = await handleSession(
-				userId,
-				"1098e2ba-bfa2-4d52-a157-61c4bca9b851"
-			);
+			const session = await handleSession(userId, course.id);
 			setSessionId(session.id);
-
 			const db_messages = await getMessages(session.id);
 			setMessages(
 				db_messages.map((m: any) => ({
@@ -51,20 +50,16 @@ export function ChatBot() {
 
 	const sendMessage = async () => {
 		if (!input.trim()) return;
-
 		const userMsg = { from: "user" as const, text: input };
 		setMessages((msgs) => [...msgs, userMsg]);
 		if (!sessionId) return;
 		await saveMessage(sessionId, "user", input);
-
 		setInput("");
 		setLoading(true);
-
 		setMessages((msgs) => [...msgs, { from: "bot", text: "" }]);
 
 		try {
 			let botReply = "";
-
 			await askChatbot(input, (token) => {
 				botReply += token;
 				setMessages((msgs) => {
@@ -73,10 +68,7 @@ export function ChatBot() {
 					return updated;
 				});
 			});
-
-			if (sessionId) {
-				await saveMessage(sessionId, "bot", botReply);
-			}
+			if (sessionId) await saveMessage(sessionId, "bot", botReply);
 		} catch (err) {
 			console.error(err);
 			setMessages((msgs) => [
@@ -89,20 +81,19 @@ export function ChatBot() {
 	};
 
 	return (
-		<div className="flex flex-col flex-1 h-screen bg-gradient-to-b from-[#FFFFFF] to-[#FAF9F7]">
+		<div className="flex flex-col flex-1 h-screen bg-[#FAF9F7]">
 			{/* Header */}
-			<header className="	p-4 shrink-0 border-b 
-    							bg-white/40 backdrop-blur-lg 
-    							border-gray-200 shadow-sm">
-				<h2 className="text-lg font-semibold text-[#F67E4A]">
-					Week 1: HTML Basics
+			<header className="px-8 py-4 border-b bg-white backdrop-blur-md border-gray-200 shadow-sm">
+				<h2 className="text-xl font-semibold text-gray-800">
+					{course?.name || "Course Chat"}
 				</h2>
-				<p className="text-sm text-gray-600">
-					Session 1.2: Discussing Semantic HTML
+				<p className="text-sm text-gray-500">
+					Chat about modules, weeks, or exercises.
 				</p>
 			</header>
+
 			{/* Messages */}
-			<div className="flex-1 overflow-y-auto p-6 space-y-2 bg-gray-50">
+			<div className="flex-1 overflow-y-auto p-6 space-y-3">
 				{messages.length === 0 && (
 					<p className="text-gray-400 text-center">Start the conversation!</p>
 				)}
@@ -113,10 +104,9 @@ export function ChatBot() {
 							}`}
 					>
 						<div
-							className={`rounded-xl px-4 py-2 max-w-[70%] ${msg.from === "user"
-								? "bg-[#514540] text-gray-200"
-								// 👈 user bubble
-								: "bg-white border border-gray-200 text-gray-900"
+							className={`rounded-2xl px-4 py-2 shadow-sm max-w-[70%] ${msg.from === "user"
+								? "bg-gray-100 text-gray-800"
+								: "bg-white border border-gray-200 text-gray-800"
 								}`}
 						>
 							{msg.text === "" && msg.from === "bot" ? (
@@ -146,24 +136,18 @@ export function ChatBot() {
 			</div>
 
 			{/* Input */}
-			<div className="p-4 border-t bg-white flex gap-2 shrink-0">
+			<div className="px-8 py-4 border-t bg-white flex gap-3 shadow-inner">
 				<Input
 					placeholder="Type a message..."
 					value={input}
 					onChange={(e) => setInput(e.target.value)}
 					onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-					className=" rounded-l
-								border border-gray-200 
-								shadow-sm 
-								focus:outline-none 
-								focus:ring-2 focus:ring-[#F67E4A]/50 
-								focus:border-[#F67E4A] 
-								transition-all"
+					className="rounded-lg border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition-all"
 				/>
 				<Button
 					onClick={sendMessage}
 					disabled={loading}
-					className="bg-[#F67E4A] hover:bg-[#e26f3c] text-white"
+					className="bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-md"
 				>
 					Send
 				</Button>

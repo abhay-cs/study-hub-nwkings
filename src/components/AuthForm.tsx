@@ -1,40 +1,45 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { signUp, signIn } from "@/lib/supabase/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from "react"
+import { signUp, signIn } from "@/lib/supabase/auth"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useRouter } from "next/navigation"
 
 export default function AuthForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
+  const [isLogin, setIsLogin] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
 
     try {
       if (isLogin) {
-        await signIn(email, password);
+        await signIn(email, password)
       } else {
-        await signUp(email, password, name);
+        const { user } = await signUp(email, password, name)
+
+        // (Optional) Save extra user info to your `public.users` table
+        // await saveUserToDB(user.id, name)
       }
-      // 🔥 redirect to homepage or dashboard
-      window.location.href = "/dashboard";
+
+      router.push("/dashboard") // ✅ better than window.location.href
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Something went wrong")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-sm mx-auto">
       {!isLogin && (
         <Input
           placeholder="Name"
@@ -70,5 +75,5 @@ export default function AuthForm() {
           : "Already have an account? Login"}
       </p>
     </form>
-  );
+  )
 }

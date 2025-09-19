@@ -128,8 +128,35 @@
     font-family: Satoshi-Variable;
     font-family: Satoshi-VariableItalic;
   }
+
   * {
     @apply border-border outline-ring/50;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    /* translucent white */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    /* matches Tailwind's rounded-xl */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .glass-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(90deg, #F67E4A, #F6874C);
+  }
+
+  .text-gradient-primary {
+    background: linear-gradient(90deg, #F67E4A, #F6874C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   body {

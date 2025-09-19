@@ -82,14 +82,12 @@ export function ChatBot({ course }: ChatBotProps) {
 
 	return (
 		<div className="flex flex-col flex-1 h-screen bg-[#FAF9F7]">
+			
 			{/* Header */}
 			<header className="px-8 py-4 border-b bg-white backdrop-blur-md border-gray-200 shadow-sm">
 				<h2 className="text-xl font-semibold text-gray-800">
 					{course?.name || "Course Chat"}
 				</h2>
-				<p className="text-sm text-gray-500">
-					Chat about modules, weeks, or exercises.
-				</p>
 			</header>
 
 			{/* Messages */}
@@ -111,9 +109,9 @@ export function ChatBot({ course }: ChatBotProps) {
 						>
 							{msg.text === "" && msg.from === "bot" ? (
 								<div className="flex gap-1">
-									<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.2s]" />
-									<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.1s]" />
-									<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+									<span className="w-2 h-2 bg-black rounded-full animate-bounce [animation-delay:-0.2s]" />
+									<span className="w-2 h-2 bg-black rounded-full animate-bounce [animation-delay:-0.1s]" />
+									<span className="w-2 h-2 bg-black rounded-full animate-bounce" />
 								</div>
 							) : (
 								<>

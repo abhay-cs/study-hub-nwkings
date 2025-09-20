@@ -18,7 +18,8 @@ export function ChatBot({ course }: ChatBotProps) {
 	const [loading, setLoading] = useState(false);
 	const [userId, setUserId] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string | null>(null);
-
+	const scrollContainerRef = React.useRef<HTMLDivElement | null>(null)
+	const [autoScroll, setAutoScroll] = useState(true)
 	useEffect(() => {
 		(async () => {
 			const user = await getCurrentUser();
@@ -28,9 +29,27 @@ export function ChatBot({ course }: ChatBotProps) {
 		})();
 	}, []);
 
+	// Auto-scroll handler
 	useEffect(() => {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages]);
+		if (autoScroll) {
+			messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+		}
+	}, [messages])
+
+	// Track user scroll
+	useEffect(() => {
+		const container = scrollContainerRef.current
+		if (!container) return
+
+		const handleScroll = () => {
+			const isAtBottom =
+				container.scrollHeight - container.scrollTop <= container.clientHeight + 20
+			setAutoScroll(isAtBottom) // ✅ only autoscroll if at bottom
+		}
+
+		container.addEventListener("scroll", handleScroll)
+		return () => container.removeEventListener("scroll", handleScroll)
+	}, [])
 
 	useEffect(() => {
 		if (!userId) return;
@@ -82,7 +101,7 @@ export function ChatBot({ course }: ChatBotProps) {
 
 	return (
 		<div className="flex flex-col flex-1 h-screen bg-[#FAF9F7]">
-			
+
 			{/* Header */}
 			<header className="px-8 py-4 border-b bg-white backdrop-blur-md border-gray-200 shadow-sm">
 				<h2 className="text-xl font-semibold text-gray-800">
@@ -91,7 +110,7 @@ export function ChatBot({ course }: ChatBotProps) {
 			</header>
 
 			{/* Messages */}
-			<div className="flex-1 overflow-y-auto p-6 space-y-3">
+			<div className="flex-1 overflow-y-auto p-6 space-y-3" ref={scrollContainerRef}>
 				{messages.length === 0 && (
 					<p className="text-gray-400 text-center">Start the conversation!</p>
 				)}

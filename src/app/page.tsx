@@ -1,12 +1,14 @@
+// src/app/page.tsx
+import { redirect } from "next/navigation"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
 
-export default function Page() {
-  return (
-    <div className="flex min-h-screen bg-slate-100 → bg-[#FAF9F7]">
-      {/* <Sidebar />
-      <main className="flex flex-1">
-        <ChatBot />
-        <Resources />
-      </main> */}
-    </div>
-  )
+export default async function Page() {
+  const supabase = await createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (!session) {
+    redirect("/login") // not logged in → go to auth
+  }
+
+  redirect("/dashboard") // logged in → go to dashboard
 }

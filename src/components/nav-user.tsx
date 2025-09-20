@@ -8,6 +8,7 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-react"
+import { signOut } from "@/lib/supabase/auth"
 
 import {
   Avatar,
@@ -88,7 +89,12 @@ export function NavUser({
               </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                await signOut()
+                window.location.href = "/login" // Redirect after logout (adjust as needed)
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

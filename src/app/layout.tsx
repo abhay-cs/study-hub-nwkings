@@ -37,8 +37,14 @@ const satoshi = localFont({
 // });
 
 export const metadata: Metadata = {
-	title: "StudyHub-NWkings",
-	description: "",
+	  title: "StudyHub – AI Study Assistant",
+  description:
+    "StudyHub is an AI-powered learning companion for online courses. Chat with context-aware tutors, access course resources, and prep for quizzes — all in one place.",
+  keywords: [
+    "StudyHub",
+    "AI tutor",
+    "LLM chatbot",
+  ],
 };
 
 export default function RootLayout({
@@ -48,6 +54,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" className={`${satoshi.variable}`}>
+			<head>
+				<link rel="icon" href="/favicon.svg" />
+			</head>
 			<body>{children}</body>
 		</html>
 	);

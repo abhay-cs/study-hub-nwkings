@@ -26,7 +26,7 @@ import {
     SidebarMenuSubItem,
     SidebarFooter
 } from "@/components/ui/sidebar"
-
+import Link from "next/link"
 import { NavUser } from "@/components/nav-user"
 import { Separator } from "@/components/ui/separator"
 // const data = {
@@ -37,11 +37,11 @@ import { Separator } from "@/components/ui/separator"
 //     },
 // }
 export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  user: {
-    name: string
-    email: string
-    avatar?: string
-  }
+    user: {
+        name: string
+        email: string
+        avatar?: string
+    }
 }
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
     return (
@@ -99,10 +99,13 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                         </SidebarMenuItem> */}
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive>
-                                <a href="/courses/[id]/chat" className="font-semibold text-primary">
+                                <Link
+                                    href="/courses/[id]/chat"
+                                    className="font-semibold text-primary flex items-center gap-2"
+                                >
                                     <MessageCircle className="size-4" />
                                     <span>Chat</span>
-                                </a>
+                                </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>

@@ -41,9 +41,12 @@ export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
         name: string
         email: string
         avatar?: string
+    },
+    course: {
+        id: string
     }
 }
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, course, ...props }: AppSidebarProps) {
     return (
         <Sidebar variant="floating" {...props} className="backdrop-blur-lg bg-white/20 border-r border-white/30 shadow-lg">
             {/* Header / Branding */}
@@ -100,7 +103,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive>
                                 <Link
-                                    href="/courses/[id]/chat"
+                                    href={`/courses/${course.id}/chat`}
                                     className="font-semibold text-primary flex items-center gap-2"
                                 >
                                     <MessageCircle className="size-4" />

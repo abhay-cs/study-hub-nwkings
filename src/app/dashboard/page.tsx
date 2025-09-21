@@ -23,11 +23,13 @@ export default async function Page() {
         .select("name, email") // select only what you need
         .eq("id", session?.user.id) // match auth user with your table
         .single();
+
+
 	return (
 		<SidebarProvider
 			style={
 				{
-					"--sidebar-width": "19rem",
+					"--sidebar-width": "18rem",
 				} as React.CSSProperties
 			}
 		>

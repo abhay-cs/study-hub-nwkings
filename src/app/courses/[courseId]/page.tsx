@@ -29,13 +29,13 @@ export default async function Page({ params }: { params: { courseId: string } })
         .single();
     return (
         <SidebarProvider
-            style={{ "--sidebar-width": "19rem" } as React.CSSProperties}
+            style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
         >
             {/* Sidebar */}
             <AppSidebar user={{
                 name: profile?.name ?? '',
                 email: profile?.email ?? ''
-            }} />
+            }} course={{id: courseId}} />
 
             {/* Main content */}
             <SidebarInset>

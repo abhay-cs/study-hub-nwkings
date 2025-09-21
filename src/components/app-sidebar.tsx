@@ -46,7 +46,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
 
 
 	return (
-		<Sidebar variant="floating" {...props} className="backdrop-blur-lg bg-white/20 border-r border-white/30 shadow-lg font-">
+		<Sidebar variant="floating" {...props} className="">
 			{/* Header / Branding */}
 			<SidebarHeader>
 				<SidebarMenu>

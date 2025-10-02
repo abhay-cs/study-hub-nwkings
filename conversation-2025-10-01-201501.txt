@@ -1,0 +1,17 @@
+
+╭─── Claude Code v2.0.1 ─────────────────────────────────────────────────╮
+│                                                    │ Tips for getting  │
+│                 Welcome back Abhay!                │ started           │
+│                                                    │ Run /init to cre… │
+│                                                    │ Use Claude to he… │
+│                       ▐▛███▜▌                      │ Be as specific a… │
+│                      ▝▜█████▛▘                     │ ✔ Run             │
+│                        ▘▘ ▝▝                       │ /terminal-…       │
+│                                                    │ ───────────────── │
+│           Sonnet 4.5 · API Usage Billing           │ Recent activity   │
+│ /Users/abhaysharma/Desktop/dev/lms_bot/lms-chatbot │ No recent activi… │
+╰────────────────────────────────────────────────────────────────────────╯
+
+
+
+

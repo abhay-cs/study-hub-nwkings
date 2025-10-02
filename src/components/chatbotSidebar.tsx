@@ -267,7 +267,7 @@ export function ChatHistorySidebar({
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{deletingSession?.title}"? This action
+                            Are you sure you want to delete &quot;{deletingSession?.title}&quot;? This action
                             cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>

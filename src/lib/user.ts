@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 
-// 🔹 Get the currently logged-in Supabase user
+
 export async function getCurrentUser() {
     const {
         data: { user },

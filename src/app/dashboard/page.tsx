@@ -4,8 +4,6 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { CourseCard } from "@/components/dashboard/CourseCard"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { DashboardHeader } from "@/components/dashboard/Header"
@@ -17,11 +15,11 @@ export default async function Page() {
 		.from("courses")
 		.select("id, name, description, created_at")
 
-	const { data: { session } } = await supabase.auth.getSession()
+	const { data: { user } } = await supabase.auth.getUser()
 	const { data: profile } = await supabase
         .from("users")
         .select("name, email") // select only what you need
-        .eq("id", session?.user.id) // match auth user with your table
+        .eq("id", user?.id) // match auth user with your table
         .single();
 
 
@@ -29,7 +27,7 @@ export default async function Page() {
 		<SidebarProvider
 			style={
 				{
-					"--sidebar-width": "18rem",
+					"--sidebar-width": "20rem",
 				} as React.CSSProperties
 			}
 		>
@@ -42,21 +40,22 @@ export default async function Page() {
 				
 				<header className="flex h-16 shrink-0 items-center gap-2 px-4">
 					<SidebarTrigger className="-ml-1" />
-					<Separator
+					{/* <Separator
 						orientation="vertical"
 						className="mr-2 data-[orientation=vertical]:h-4"
-					/>
-					<Breadcrumb>
+					/> */}
+					{/* <Breadcrumb>
 						<BreadcrumbList>
 							<BreadcrumbItem className="hidden md:block">
 								<BreadcrumbPage>Dashboard</BreadcrumbPage>
 							</BreadcrumbItem>
 						</BreadcrumbList>
-					</Breadcrumb>
+					</Breadcrumb> */}
 				</header>
 				<DashboardHeader user={profile ?? null} />
 				{/* Main Content */}
 				<div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+					
 					<div className="grid auto-rows-min gap-6 sm:grid-cols-2 lg:grid-cols-3">
 						{courses?.map((course) => (
 							<CourseCard key={course.id} course={course} />

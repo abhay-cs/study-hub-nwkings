@@ -1,163 +1,159 @@
-import * as React from "react"
-import {
-    Home,
-    GraduationCap,
-    Calendar,
-    Bell,
-    TrendingUp,
-    BookOpen,
-    Layers,
-    MessageCircle,
-    Folder,
-    Settings,
-    HelpCircle,
-} from "lucide-react"
+"use client";
 
+import * as React from "react";
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-    SidebarFooter
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { NavUser } from "@/components/nav-user"
-import { Separator } from "@/components/ui/separator"
-// const data = {
-//     user: {
-//         name: "Demo User",
-//         email: "demo@example.com",
-//         avatar: "/avatar.png"
-//     },
-// }
-export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    user: {
-        name: string
-        email: string
-        avatar?: string
-    },
-    course: {
-        id: string
-    }
+	ChevronUp,
+	User,
+	Settings2,
+	LogOut,
+} from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+	Sidebar,
+	SidebarFooter,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarRail,
+} from "@/components/ui/sidebar";
+import { ChatHistorySidebar } from "@/components/chatbotSidebar";
+import { supabase } from "@/lib/supabase/client";
+
+interface AppSidebarProps {
+	user: { id: string; name: string; email: string; avatar?: string };
+	course: { id: string };
+	currentSessionId?: string;
+	onSessionSelect?: (sessionId: string) => void;
+	onNewChat?: () => void;
 }
-export function AppSidebar({ user, course, ...props }: AppSidebarProps) {
-    return (
-        <Sidebar variant="floating" {...props} className="backdrop-blur-lg bg-white/20 border-r border-white/30 shadow-lg">
-            {/* Header / Branding */}
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <a href="/dashboard">
-                                <div>
-                                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="10" cy="24" r="8" fill="currentColor" />
-                                        <circle cx="24" cy="24" r="8" fill="currentColor" />
-                                        <circle cx="38" cy="24" r="8" fill="currentColor" />
-                                    </svg>
-                                </div>
 
-                                <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-bold text-xl">StudyHub</span>
-                                </div>
-                            </a>
-                        </SidebarMenuButton>
+export function AppSidebar({
+	user,
+	course,
+	currentSessionId,
+	onSessionSelect,
+	onNewChat,
+	...props
+}: AppSidebarProps & React.ComponentProps<typeof Sidebar>) {
+	const handleLogout = async () => {
+		await supabase.auth.signOut();
+		window.location.href = "/auth";
+	};
 
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
+	return (
+		<Sidebar variant="floating" {...props}>
+			{/* Header */}
+			<SidebarHeader>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<SidebarMenuButton size="lg" asChild>
+							<a href="/dashboard" className="flex items-center gap-2">
+								<div>
+									<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<circle cx="10" cy="24" r="8" fill="currentColor" />
+										<circle cx="24" cy="24" r="8" fill="currentColor" />
+										<circle cx="38" cy="24" r="8" fill="currentColor" />
+									</svg>
+								</div>
+								<span className="font-bold text-xl">StudyHub</span>
+							</a>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarHeader>
 
-            {/* Main Navigation */}
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarMenu className="gap-2">
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <a href="/dashboard">
-                                    <Home className="size-4" />
-                                    <span>Dashboard</span>
-                                </a>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
+			{/* Only ChatHistorySidebar */}
+			{/* <div className="flex flex-col h-full"> */}
+				{/* Chat history list scrolls */}
+				<div className="flex flex-col flex-1 overflow-hidden">
+					<ChatHistorySidebar
+						currentSessionId={currentSessionId}
+						onSessionSelect={onSessionSelect || (() => { })}
+						userId={user.id}
+						courseId={course.id}
+					/>
+				</div>
 
-                    </SidebarMenu>
-                </SidebarGroup>
-                <Separator />
-                {/* Course Navigation */}
-                <SidebarGroup>
-                    <SidebarMenu className="gap-2">
-                        {/* <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <a href="/courses/[id]">
-                                    <BookOpen className="size-4" />
-                                    <span>Overview</span>
-                                </a>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem> */}
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive>
-                                <Link
-                                    href={`/courses/${course.id}/chat`}
-                                    className="font-semibold text-primary flex items-center gap-2"
-                                >
-                                    <MessageCircle className="size-4" />
-                                    <span>Chat</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton>
-                                <Layers className="size-4" />
-                                <span>Modules</span>
-                            </SidebarMenuButton>
-                            {/* <SidebarMenuSub>
-                                <SidebarMenuSubItem>
-                                    <SidebarMenuSubButton asChild>
-                                        <a href="#">Week 1</a>
-                                    </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                                <SidebarMenuSubItem>
-                                    <SidebarMenuSubButton asChild>
-                                        <a href="#">Week 2</a>
-                                    </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                            </SidebarMenuSub> */}
-                        </SidebarMenuItem>
+				{/* Footer stays fixed */}
+				<SidebarFooter className="border-t">
+					<SidebarMenu>
+						<SidebarMenuItem>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<SidebarMenuButton size="lg">
+										<Avatar className="h-8 w-8 rounded-lg">
+											{user.avatar ? (
+												<AvatarImage src={user.avatar} alt={user.name} />
+											) : (
+												<AvatarFallback className="rounded-lg">
+													{user.name
+														.split(" ")
+														.map((n) => n[0])
+														.join("")
+														.toUpperCase()}
+												</AvatarFallback>
+											)}
+										</Avatar>
+										<div className="grid flex-1 text-left text-sm leading-tight">
+											<span className="truncate font-semibold">{user.name}</span>
+											<span className="truncate text-xs">{user.email}</span>
+										</div>
+										<ChevronUp className="ml-auto size-4" />
+									</SidebarMenuButton>
+								</DropdownMenuTrigger>
 
-                        {/* <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <a href="/courses/[id]/resources">
-                                    <Folder className="size-4" />
-                                    <span>Resources</span>
-                                </a>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem> */}
-                    </SidebarMenu>
-                </SidebarGroup>
+								<DropdownMenuContent
+									className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+									side="top"
+									align="end"
+									sideOffset={4}
+								>
+									<DropdownMenuLabel className="p-0 font-normal">
+										<div className="flex items-center gap-2 px-1 py-1.5 text-sm">
+											<Avatar className="h-8 w-8 rounded-lg">
+												<AvatarFallback className="rounded-lg">
+													{user.name
+														.split(" ")
+														.map((n) => n[0])
+														.join("")
+														.toUpperCase()}
+												</AvatarFallback>
+											</Avatar>
+											<div className="grid flex-1 text-left">
+												<span className="font-semibold">{user.name}</span>
+												<span className="text-xs">{user.email}</span>
+											</div>
+										</div>
+									</DropdownMenuLabel>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem>
+										<User className="mr-2 h-4 w-4" /> Profile
+									</DropdownMenuItem>
+									<DropdownMenuItem>
+										<Settings2 className="mr-2 h-4 w-4" /> Settings
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem onClick={handleLogout}>
+										<LogOut className="mr-2 h-4 w-4" /> Log out
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</SidebarMenuItem>
+					</SidebarMenu>
+				</SidebarFooter>
 
-                {/* Footer */}
-                <SidebarGroup>
-                    <SidebarMenu className="gap-2">
-                        {/* <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <a href="/settings">
-                  <Settings className="size-4" />
-                  <span>Settings</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem> */}
-                    </SidebarMenu>
-                </SidebarGroup>
-            </SidebarContent>
-            <SidebarFooter>
-                <NavUser user={{ ...user, avatar: user.avatar || '/avatar.png' }} />
-            </SidebarFooter>
-        </Sidebar>
-    )
+
+			<SidebarRail />
+		</Sidebar>
+	);
 }

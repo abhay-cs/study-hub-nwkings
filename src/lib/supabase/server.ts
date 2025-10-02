@@ -23,9 +23,9 @@ export async function createSupabaseServerClient() {
 
 export async function getSession() {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.auth.getSession();
+    const { data, error } = await supabase.auth.getUser();
     if (error) throw error;
-    return data.session;
+    return data.user;
 }
 
 

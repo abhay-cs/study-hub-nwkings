@@ -5,12 +5,12 @@ export function CourseCard({ course }: { course: any }) {
     <div className="bg-white rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] transition-shadow duration-300 flex flex-col group">
       <div className="p-3 flex-grow">
         <div className="flex items-center gap-4 mb-4">
-          <div className="gradient-circle w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+          {/* <div className="gradient-circle w-14 h-14 rounded-full flex items-center justify-center text-black text-xl font-bold flex-shrink-0">
             {course.name
               .split(" ")
               .map((w: string) => w[0])
               .join("")}
-          </div>
+          </div> */}
           <div>
             <h2 className="text-xl font-medium text-gray-900">{course.name}</h2>
           </div>

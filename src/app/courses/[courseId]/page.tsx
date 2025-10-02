@@ -1,68 +1,36 @@
-import { AppSidebar } from "@/components/app-sidebar-course"
-import {
-    SidebarInset,
-    SidebarProvider,
-    SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
-import { ChatBot } from "@/components/chatbot"
-import Resources from "@/components/resources"
-import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import ClientPage from "./clientPage";
 
 export default async function Page({ params }: { params: { courseId: string } }) {
-    const { courseId } = params
+  const { courseId } = await params;
 
-    // Fetch course data
-    const supabase = await createSupabaseServerClient()
-    const { data: course } = await supabase
-        .from("courses")
-        .select("*")
-        .eq("id", courseId)
-        .single()
+  // ✅ Safe: runs on server
+  const supabase = await createSupabaseServerClient();
 
-    const { data: { session } } = await supabase.auth.getSession()
-    const { data: profile } = await supabase
-        .from("users")
-        .select("name, email") // select only what you need
-        .eq("id", session?.user.id) // match auth user with your table
-        .single();
-    return (
-        <SidebarProvider
-            style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
-        >
-            {/* Sidebar */}
-            <AppSidebar user={{
-                name: profile?.name ?? '',
-                email: profile?.email ?? ''
-            }} course={{id: courseId}} />
+  const { data: course } = await supabase
+    .from("courses")
+    .select("*")
+    .eq("id", courseId)
+    .single();
 
-            {/* Main content */}
-            <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-                    <SidebarTrigger className="-ml-1" />
-                    <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className="hidden md:block">
-                                <BreadcrumbPage>Courses</BreadcrumbPage>
-                            </BreadcrumbItem>
-                            <BreadcrumbItem className="hidden md:block">
-                                <BreadcrumbPage>{course?.name}</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
-                </header>
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
+  const { data: profile } = await supabase
+    .from("users")
+    .select("name, email")
+    .eq("id", user?.id)
+    .single();
 
-                {/* Course Content */}
-                <div className="flex flex-1 flex-col items-center p-1 gap-4">
-                    <div className="w-full flex flex-col h-[90vh]">
-                        <ChatBot course={course} />
-                    </div>
-                    {/* <Resources course={course} /> */}
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
-    )
+  return (
+    <ClientPage
+      course={course}
+      user={{
+        id: user?.id ?? "",
+        name: profile?.name ?? "",
+        email: profile?.email ?? "",
+      }}
+    />
+  );
 }

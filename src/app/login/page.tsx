@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { signIn, signUp } from "@/lib/supabase/auth"
+import { useState, useEffect } from "react"
+import { signIn, signUp, resendVerification } from "@/lib/supabase/auth"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
+import { useSearchParams } from "next/navigation"
+import { Mail, AlertCircle } from "lucide-react"
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -12,20 +14,56 @@ export default function AuthPage() {
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [verificationSent, setVerificationSent] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
+
+  const searchParams = useSearchParams()
+  const urlError = searchParams.get("error")
+
+  useEffect(() => {
+    if (urlError === "verification_failed") {
+      setError("Email verification failed. Please try again.")
+    }
+  }, [urlError])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
+    setLoading(true)
 
     try {
       if (isLogin) {
         await signIn(email, password)
+        window.location.href = "/dashboard"
       } else {
         await signUp(email, password, name)
+        setVerificationSent(true)
       }
-      window.location.href = "/dashboard"
+    } catch (err: any) {
+      // Better error messages
+      if (err.message.includes("Email not confirmed")) {
+        setError("Please verify your email before logging in. Check your inbox.")
+      } else if (err.message.includes("Invalid login credentials")) {
+        setError("Invalid email or password.")
+      } else {
+        setError(err.message)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleResendVerification() {
+    setResendLoading(true)
+    setError(null)
+    try {
+      await resendVerification(email)
+      setError(null)
     } catch (err: any) {
       setError(err.message)
+    } finally {
+      setResendLoading(false)
     }
   }
 
@@ -83,70 +121,133 @@ export default function AuthPage() {
               </button>
             </div>
 
-            {/* Animated Form */}
-            <AnimatePresence mode="wait">
-              <motion.form
-                key={isLogin ? "login" : "signup"}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.35 }}
-                className="space-y-4"
-                onSubmit={handleSubmit}
+            {/* Verification Success Message */}
+            {verificationSent ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center space-y-4 py-4"
               >
-                {!isLogin && (
-                  <Input
-                    type="text"
-                    placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                )}
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-                <Button
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary/90"
-                >
-                  {isLogin ? "Login" : "Sign Up"}
-                </Button>
-              </motion.form>
-            </AnimatePresence>
+                <div className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                  <Mail className="w-8 h-8 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Check your email!</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    We sent a verification link to <strong>{email}</strong>
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Click the link in the email to verify your account, then come back to login.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={handleResendVerification}
+                    disabled={resendLoading}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {resendLoading ? "Sending..." : "Resend verification email"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setVerificationSent(false)
+                      setIsLogin(true)
+                    }}
+                    variant="ghost"
+                    className="w-full"
+                  >
+                    Back to Login
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              <>
+                {/* Animated Form */}
+                <AnimatePresence mode="wait">
+                  <motion.form
+                    key={isLogin ? "login" : "signup"}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.35 }}
+                    className="space-y-4"
+                    onSubmit={handleSubmit}
+                  >
+                    {!isLogin && (
+                      <Input
+                        type="text"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                      />
+                    )}
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <Input
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                    {error && (
+                      <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                      </div>
+                    )}
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-primary hover:bg-primary/90"
+                    >
+                      {loading ? "Loading..." : isLogin ? "Login" : "Sign Up"}
+                    </Button>
+                    {isLogin && (
+                      <div className="text-center">
+                        <a
+                          href="/reset-password"
+                          className="text-sm text-primary hover:underline"
+                        >
+                          Forgot password?
+                        </a>
+                      </div>
+                    )}
+                  </motion.form>
+                </AnimatePresence>
+              </>
+            )}
 
             {/* Switch */}
-            <p className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
-              {isLogin ? (
-                <>Don&apos;t have an account?{" "}
-                  <span
-                    onClick={() => setIsLogin(false)}
-                    className="font-semibold text-primary hover:underline cursor-pointer"
-                  >
-                    Sign up
-                  </span></>
-              ) : (
-                <>Already have an account?{" "}
-                  <span
-                    onClick={() => setIsLogin(true)}
-                    className="font-semibold text-primary hover:underline cursor-pointer"
-                  >
-                    Login
-                  </span></>
-              )}
-            </p>
+            {!verificationSent && (
+              <p className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                {isLogin ? (
+                  <>Don&apos;t have an account?{" "}
+                    <span
+                      onClick={() => setIsLogin(false)}
+                      className="font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                      Sign up
+                    </span></>
+                ) : (
+                  <>Already have an account?{" "}
+                    <span
+                      onClick={() => setIsLogin(true)}
+                      className="font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                      Login
+                    </span></>
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>
